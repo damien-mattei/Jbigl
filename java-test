@@ -1,0 +1,6 @@
+#!/bin/sh
+
+CLASSPATH=.:$BIGLOOCLASSPATH:$BUGLOOCLASSPATH:'/usr/local/lib/bigloo/4.2c/bigloo_s.zip'
+export CLASSPATH
+
+exec java  $BIGLOOJAVAOPT $BUGLOOJAVAOPT   eu.oca.bigloofunct.BiglooCode $*

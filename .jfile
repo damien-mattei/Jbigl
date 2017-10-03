@@ -1,0 +1,7 @@
+;; /Users/mattei/bigloo4.1a/examples/Jbigl
+;; Sat Dec  5 12:10:41 2015
+
+(
+  (eu.oca.bigloofunct.BiglooCode "eu.oca.bigloofunct.BiglooCode")
+)
+

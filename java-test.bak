@@ -1,0 +1,6 @@
+#!/bin/sh
+
+CLASSPATH=.:$BIGLOOCLASSPATH:$BUGLOOCLASSPATH:'/usr/local/lib/bigloo/4.2c/bigloo_s.zip':/home/mattei/NetBeansProjects/Sidonie/build/web/WEB-INF/classes:~/Dropbox/mysql-connector-java-5.1.38-bin.jar
+export CLASSPATH
+
+exec java  $BIGLOOJAVAOPT $BUGLOOJAVAOPT   eu.oca.bigloofunct.BiglooCode $*

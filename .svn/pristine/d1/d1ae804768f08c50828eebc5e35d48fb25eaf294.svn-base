@@ -1,0 +1,13 @@
+(directives
+ (java 
+  
+  (abstract-class java.sql.ResultSet
+		  
+		  (method abstract public  next::bool (::java.sql.ResultSet )  "next")
+		  (method abstract public  last::bool (::java.sql.ResultSet )  "last")
+		  (method abstract public  getRow::int (::java.sql.ResultSet )  "getRow")
+		  (method abstract public  beforeFirst::void (::java.sql.ResultSet )  "beforeFirst")
+		  "java.sql.ResultSet")
+  
+  )
+ )
