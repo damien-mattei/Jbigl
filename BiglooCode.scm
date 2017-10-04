@@ -147,7 +147,7 @@
 ;; end module
 
 ;; global variables
-(set! debug-mode #t)
+;;(set! debug-mode #t)
 
 
 ;; macros 
@@ -491,9 +491,10 @@
 	 (resultd-str "")
 	 (resultmi 0)
 	 (resultmi-str "")
+	 ;;(debug-mode #t)
 	 )
 
-    (set! debug-mode #t)
+    (set! debug-mode #f)
     (display-var-nl "BiglooCode.scm :: ResultatMesuresF ::  debug-mode = "  debug-mode )
 
     ;;(debug-display-msg-symb-nl  "BiglooCode.scm :: ResultatMesuresF ::" nombreobjets ) ;; je sais pas pourquoi cette macro fais planter bigloo ici mais pas dans d'autres situations
