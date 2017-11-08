@@ -24,18 +24,18 @@
 
 
 
-	(include "../../../Dropbox/git/LOGIKI/lib/syntactic-sugar.scm") ;; YES in bigloo you can include files from other schemes...
+	(include "../../../Dropbox/git/library-FunctProg/syntactic-sugar.scm") ;; YES in bigloo you can include files from other schemes...
 	
-	;;(include "../../../Dropbox/git/LOGIKI/lib/display-bigloo-scheme.scm")
+	;;(include "../../../Dropbox/git/library-FunctProg/display-bigloo-scheme.scm")
 	
-	(include "../../../Dropbox/git/LOGIKI/lib/bigloo/escape-char-bigloo-scheme.scm")
-	(include "../../../Dropbox/git/LOGIKI/lib/display.scm")
+	(include "../../../Dropbox/git/library-FunctProg/bigloo/escape-char-bigloo-scheme.scm")
+	(include "../../../Dropbox/git/library-FunctProg/display.scm")
 
-	(include "../../../Dropbox/git/LOGIKI/lib/debug.scm")
+	(include "../../../Dropbox/git/library-FunctProg/debug.scm")
 
-	;; (include-relative "../../../Dropbox/git/LOGIKI/lib/syntactic-sugar.scm") ;; YES in bigloo you can include files from other schemes...
-	;; (include-relative  "../../../Dropbox/git/LOGIKI/lib/display.scm")
-	;; (include-relative  "../../../Dropbox/git/LOGIKI/lib/debug.scm")
+	;; (include-relative "../../../Dropbox/git/library-FunctProg/syntactic-sugar.scm") ;; YES in bigloo you can include files from other schemes...
+	;; (include-relative  "../../../Dropbox/git/library-FunctProg/display.scm")
+	;; (include-relative  "../../../Dropbox/git/library-FunctProg/debug.scm")
 
 	;; (include "../../../Dropbox/lib/syntactic-sugar.scm") ;; YES in bigloo you can include files from other schemes...
 	;; (include "../../../Dropbox/lib/display.scm")
@@ -926,9 +926,14 @@
 		  ;; (debug-display bs-result)
 		  ;; (debug-newline)
 
-		  (debug-display-nl "BiglooCode.scm :: ResultatMesuresF : before  (set! result-double .....)")
+		  ;; useless, only for tests
+		  ;;(debug-display-nl "BiglooCode.scm :: ResultatMesuresF : before  (set! result-double .....)")
+		  
 		  ;;(set! result-double (java.sql.ResultSet-getDouble2 rs 3))
-		  (set! result-double (eu.oca.bigloofunct.JavaForBigloo-pi2dec))
+
+		  ;; useless, only for tests
+		  ;;(set! result-double (eu.oca.bigloofunct.JavaForBigloo-pi2dec))
+
 		  ;; (set! result-double (eu.oca.bigloofunct.JavaForBigloo-piFloat))
 		  ;; (debug-display-nl "BiglooCode.scm :: ResultatMesuresF : before  (set! result2 .......)")
 		  ;; (set! result2 (+fl result-double 0.0))
@@ -936,12 +941,18 @@
 		  ;; (debug-display result2)
 		  ;; (debug-newline)
 		  ;; (debug-display-nl "BiglooCode.scm :: ResultatMesuresF : before display")
-		  (debug-display "BiglooCode.scm :: ResultatMesuresF : result-double = ")
+
+		  ;; useless, only for tests
+		  ;;(debug-display "BiglooCode.scm :: ResultatMesuresF : result-double = ")
+		  
 		  ;;(debug-display result-double)
 		  ;;(printf "~a" result-double)
 		  ;;(printf "~s" result-double)
-		  (debug-display (double->ieee-string result-double))
-		  (debug-newline)
+		  
+		  ;; useless, only for tests
+		  ;;(debug-display (double->ieee-string result-double))
+		  ;;(debug-newline)
+		  
 		  ;;(debug-display (real->string result-double))
 		  ;;(debug-newline)
 		  ;;(debug-display-nl "BiglooCode.scm :: ResultatMesuresF : before display-var-nl")
@@ -957,23 +968,29 @@
 	     
 		  (set! str-result bs-result)
 
-		  (let* ((sp (string-split str-result "."))
-			 (irss (car sp))
-			 (frss (cadr sp))
-			 (irs (string->number irss))
-			 (frs (string->number frss))
-			 (len-frss (string-length frss))
-			 (expo (expt 10 len-frss))
-			 (frc-rs (/ frs expo))
-			 (rsf (+ irs frc-rs))
-			 )
-		    (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresF : irss = " irss)
-		    (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresF : frss = " frss)
-		    (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresF : irs = " irs)
-		    (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresF : frs = " frs)
-		    ;;(debug-display-var-nl "BiglooCode.scm :: ResultatMesuresF : rsf = " rsf)
-		    (eu.oca.bigloofunct.JavaForBigloo-displayDoubleNL rsf)
-		    )
+		  
+		  ;; lonely block that do nothing else than printing but cause the app to crash !! => commented now !
+
+		  ;; (let* ((sp (string-split str-result "."))
+		  ;; 	 (irss (car sp))
+		  ;; 	 (frss (cadr sp))
+		  ;; 	 (irs (string->number irss))
+		  ;; 	 (frs (string->number frss))
+		  ;; 	 (len-frss (string-length frss))
+		  ;; 	 (expo (expt 10 len-frss))
+		  ;; 	 (frc-rs (/ frs expo))
+		  ;; 	 (rsf (+ irs frc-rs))
+		  ;; 	 )
+		  ;;   (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresF : irss = " irss)
+		  ;;   (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresF : frss = " frss)
+		  ;;   (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresF : irs = " irs)
+		  ;;   (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresF : frs = " frs)
+		  ;;   (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresF : len-frss = " len-frss)
+		  ;;   (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresF : expo = " expo)
+		  ;;   (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresF : frc-rs = " frc-rs)
+		  ;;   (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresF : rsf = " rsf)
+		  ;;   (eu.oca.bigloofunct.JavaForBigloo-displayDoubleNL rsf) ;; cause erreur
+		  ;;   )
 		  
 		  (debug-display  "BiglooCode.scm :: ResultatMesuresF : (real? result-double) =")
 		  (debug-display (real? result-double))
@@ -3017,9 +3034,14 @@
 		  ;; (debug-display bs-result)
 		  ;; (debug-newline)
 
-		  (debug-display-nl "BiglooCode.scm :: ResultatMesuresAF : before  (set! result-double .....)")
+		  ;; seems useless
+		  ;;(debug-display-nl "BiglooCode.scm :: ResultatMesuresAF : before  (set! result-double .....)")
+		  
 		  ;;(set! result-double (java.sql.ResultSet-getDouble2 rs 3))
-		  (set! result-double (eu.oca.bigloofunct.JavaForBigloo-pi2dec))
+		  
+		  ;; seems useless
+		  ;;(set! result-double (eu.oca.bigloofunct.JavaForBigloo-pi2dec))
+
 		  ;; (set! result-double (eu.oca.bigloofunct.JavaForBigloo-piFloat))
 		  ;; (debug-display-nl "BiglooCode.scm :: ResultatMesuresAF : before  (set! result2 .......)")
 		  ;; (set! result2 (+fl result-double 0.0))
@@ -3027,12 +3049,18 @@
 		  ;; (debug-display result2)
 		  ;; (debug-newline)
 		  ;; (debug-display-nl "BiglooCode.scm :: ResultatMesuresAF : before display")
-		  (debug-display "BiglooCode.scm :: ResultatMesuresAF : result-double = ")
+
+		  ;; seems useless
+		  ;;(debug-display "BiglooCode.scm :: ResultatMesuresAF : result-double = ")
+
 		  ;;(debug-display result-double)
 		  ;;(printf "~a" result-double)
 		  ;;(printf "~s" result-double)
-		  (debug-display (double->ieee-string result-double))
-		  (debug-newline)
+
+		  ;; seems useless
+		  ;;(debug-display (double->ieee-string result-double))
+		  ;;(debug-newline)
+
 		  ;;(debug-display (real->string result-double))
 		  ;;(debug-newline)
 		  ;;(debug-display-nl "BiglooCode.scm :: ResultatMesuresAF : before display-var-nl")
@@ -3048,23 +3076,27 @@
 	     
 		  (set! str-result bs-result)
 		  
-		  (let* ((sp (string-split str-result "."))
-			 (irss (car sp))
-			 (frss (cadr sp))
-			 (irs (string->number irss))
-			 (frs (string->number frss))
-			 (len-frss (string-length frss))
-			 (expo (expt 10 len-frss))
-			 (frc-rs (/ frs expo))
-			 (rsf (+ irs frc-rs))
-			 )
-		    (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresAF : irss = " irss)
-		    (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresAF : frss = " frss)
-		    (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresAF : irs = " irs)
-		    (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresAF : frs = " frs)
-		    ;;(debug-display-var-nl "BiglooCode.scm :: ResultatMesuresAF : rsf = " rsf)
-		    (eu.oca.bigloofunct.JavaForBigloo-displayDoubleNL rsf)
-		    )
+
+
+		  ;; buggy bigloo language needs to comment below:
+
+		  ;; (let* ((sp (string-split str-result "."))
+		  ;; 	 (irss (car sp))
+		  ;; 	 (frss (cadr sp))
+		  ;; 	 (irs (string->number irss))
+		  ;; 	 (frs (string->number frss))
+		  ;; 	 (len-frss (string-length frss))
+		  ;; 	 (expo (expt 10 len-frss))
+		  ;; 	 (frc-rs (/ frs expo))
+		  ;; 	 (rsf (+ irs frc-rs))
+		  ;; 	 )
+		  ;;   (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresAF : irss = " irss)
+		  ;;   (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresAF : frss = " frss)
+		  ;;   (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresAF : irs = " irs)
+		  ;;   (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresAF : frs = " frs)
+		  ;;   ;;(debug-display-var-nl "BiglooCode.scm :: ResultatMesuresAF : rsf = " rsf)
+		  ;;   (eu.oca.bigloofunct.JavaForBigloo-displayDoubleNL rsf)
+		  ;;   )
 
 		  (debug-display  "BiglooCode.scm :: ResultatMesuresAF : (real? result-double) =")
 		  (debug-display (real? result-double))
