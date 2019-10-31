@@ -7,6 +7,7 @@
 	       (debug-display (java.sql.ResultSet-wasNull rs))
 	       (debug-newline)))))
 
+
 ;; (define-syntax error 
 ;;   (syntax-rules ()
 ;;     ((_ arg1 arg2 arg3 ...)
