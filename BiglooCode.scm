@@ -10,7 +10,6 @@
 ;;
 ;; building a jar library for netbeans:
 ;; jar cf ~/Dropbox/BiglFunctProg.jar eu
-
 ;; how to make bigloo_s.zip usable by tomcat server:
 ;; mkdir tmp
 ;; cd tmp
@@ -20,16 +19,29 @@
 
 
 
+
+
 (module eu.oca.bigloofunct.BiglooCode 
 
+	
+	(include "macro.scm")
 
+	;(include "../../../Dropbox/git/library-FunctProg/bigloo/error-bigloo-scheme.scm")
+	;(include "../../../Dropbox/git/library-FunctProg/check-arg.scm")
+	;(include "../../../Dropbox/git/library-FunctProg/let.scm")
+	;(include "../../../Dropbox/git/library-FunctProg/bigloo/srfi-14-character-set-bigloo-scheme.scm")
 
+	;(include "../../../Dropbox/git/library-FunctProg/srfi/srfi-13-s48-module.scm")
+	;(include "../../../Dropbox/git/library-FunctProg/srfi/srfi-13.scm")
 	(include "../../../Dropbox/git/library-FunctProg/syntactic-sugar.scm") ;; YES in bigloo you can include files from other schemes...
 	
 	;;(include "../../../Dropbox/git/library-FunctProg/display-bigloo-scheme.scm")
 	
 	(include "../../../Dropbox/git/library-FunctProg/bigloo/escape-char-bigloo-scheme.scm")
+
 	(include "../../../Dropbox/git/library-FunctProg/display.scm")
+	(include "../../../Dropbox/git/library-FunctProg/first-and-rest.scm")
+	(include "../../../Dropbox/git/library-FunctProg/second-third-and-co.scm")
 
 	(include "../../../Dropbox/git/library-FunctProg/debug.scm")
 
@@ -146,9 +158,6 @@
 
 ;; end module
 
-;; global variables
-;;(set! debug-mode #t)
-
 
 ;; macros 
 
@@ -159,12 +168,7 @@
 ;;     ((_ fn) (include fn))))
 
 
-(define-syntax display-wasnull 
-  (syntax-rules ()
-    ((_ rs)  (begin
-	       (debug-display "BiglooCode.scm :: ResultatMesuresF : = (java.sql.ResultSet-wasNull rs):")
-	       (debug-display (java.sql.ResultSet-wasNull rs))
-	       (debug-newline)))))
+
 
 
 ;; (define-syntax when
@@ -183,21 +187,21 @@
 (define (start argv)
   
   (let* ((tab (make-int* 2))
-	(str (make-byte* 5))
-	(tabstr (make-byte** 3))
-	;;(bstr::byte* " WORLD")
-	(bstr (make-byte* 5))
-	(bstr2 (make-byte* 5))
-	(v (make-vector 3))
-	(identificateur "Nom")
-	;;(identificateur "")
-	;;(objet "cocorico")
-	(objet "COU 1027")
-	(choixres "Orbite")
-	(bstr_identificateur (make-byte* (string-length identificateur)))
-	(bstr_objet (make-byte* (string-length objet)))
-	(bstr_choixres (make-byte* (string-length choixres))))
-
+	 (str (make-byte* 5))
+	 (tabstr (make-byte** 3))
+	 ;;(bstr::byte* " WORLD")
+	 (bstr (make-byte* 5))
+	 (bstr2 (make-byte* 5))
+	 (v (make-vector 3))
+	 (identificateur "Nom")
+	 ;;(identificateur "")
+	 ;;(objet "cocorico")
+	 (objet "COU 1027")
+	 (choixres "Orbite")
+	 (bstr_identificateur (make-byte* (string-length identificateur)))
+	 (bstr_objet (make-byte* (string-length objet)))
+	 (bstr_choixres (make-byte* (string-length choixres))))
+    
 
     (set! bstr_identificateur identificateur)
     (set! bstr_objet objet)
@@ -372,6 +376,7 @@
 	 (identificateur (make-string len_bstr_identificateur))
 	 (len_bstr_objet (byte*-length bstr_objet))
 	 (objet (make-string len_bstr_objet))
+	 
 	 (len_bstr_choixres (byte*-length bstr_choixres))
 	 (choixres (make-string len_bstr_choixres))
 	 (essai "")
@@ -392,8 +397,11 @@
 	 (flagnom 0)
 	 (flagobjet 0)
 	 (requeteuni::java.lang.String  (begin
-					  (set! objet bstr_objet)
+					  (set! objet bstr_objet) ;; pourquoi j'affecte objet ici , ce serai mieux au niveau de la definition et juste apres l'allocation (peut etre pour eviter un comportement bizarre du compilateur)
+					  (display-nl "BiglooCode.scm : ResultatMesuresF: launching convert-Nom")
+					  (set! objet (convert-Nom objet))
 					  (eu.oca.bigloofunct.JavaForBigloo-bstring->jstring (string-append "SELECT DISTINCTROW Coordonnées.Nom FROM Coordonnées WHERE Coordonnées.Nom Like '" objet " %'"))))
+
 	 (requetexiste "")
 	 ;;(requetexiste::java.lang.String (java.lang.String-java.lang.String8 (string-append "SELECT DISTINCTROW Coordonnées.Nom FROM Coordonnées WHERE Coordonnées.Nom Like '" objet "'")))
 	 ;;(jstr::%jstring (eu.oca.bigloofunct.JavaForBigloo-bstring->jstring "hello boy"))
@@ -418,7 +426,7 @@
 	 
 	 (sqlorbite
 	   (sql-server->mysql-server-syntax 
-	   (string-append
+	    (string-append
 	    "SELECT DISTINCTROW Coordonnées.Nom, Coordonnées.[N° Fiche], Coordonnées.[N° BD], Coordonnées.[N° ADS]"
 	    ", Coordonnées.[Alpha 2000], Coordonnées.[Delta 2000], Coordonnées.mag1, Coordonnées.mag2, Coordonnées.Spectre"
 	    ", Coordonnées.[N° HIP], Coordonnées.[Orb]"
@@ -491,10 +499,17 @@
 	 (resultd-str "")
 	 (resultmi 0)
 	 (resultmi-str "")
-	 ;;(debug-mode #t)
+	 (objet_WDS "")
+
+	 ;; 2000-Coordinates of the object
+	 (alpha 0) 
+	 (delta 0)
+	 (exist-alpha #t)
+	 (exist-delta #t)
+	 
 	 )
 
-    (set! debug-mode #f)
+    (set! debug-mode #f) ;; debug-mode is defined in debug.scm
     (display-var-nl "BiglooCode.scm :: ResultatMesuresF ::  debug-mode = "  debug-mode )
 
     ;;(debug-display-msg-symb-nl  "BiglooCode.scm :: ResultatMesuresF ::" nombreobjets ) ;; je sais pas pourquoi cette macro fais planter bigloo ici mais pas dans d'autres situations
@@ -879,9 +894,9 @@
 	     ;;(java.sql.ResultSet-first rs)
 
 	     (if (not (java.sql.ResultSet-first rs))
-	     
+		 
 		 (then-block ;; empty result set
-
+		  
 		  (debug-display-nl (string-append "BiglooCode.scm :: ResultatMesuresF :  empty result set"))
 		  (set! baratin "Cet objet n'existe pas dans la base ou est mal orthographié !")
 		  (set! flagerreur 1))
@@ -1125,6 +1140,8 @@
 
 		
 		   (begin  ;; else du if
+  
+
 		     (set! res (string-append
 			    res
 			    "<div align=\"center\">
@@ -1158,9 +1175,12 @@
 							      ;; (debug-newline)
 
 							      (if (java.sql.ResultSet-wasNull rs)
-								  (set! result "&nbsp;")
-								  (begin ;; else
+								  (then-block
+								    (set! result "&nbsp;")
+								    (set! exist-alpha #f))
+								  (else-block ;; else
 								    (set! iresult (floor result-double))
+								    (set! alpha iresult)
 								    (debug-display  "BiglooCode.scm :: ResultatMesuresF : (eu.oca.bigloofunct.JavaForBigloo-displayDoubleNL iresult) = ")
 								    (eu.oca.bigloofunct.JavaForBigloo-displayDoubleNL iresult)
 
@@ -1260,12 +1280,19 @@
 							  (eu.oca.bigloofunct.JavaForBigloo-displayDoubleNL result-double)
 
 							  (if (java.sql.ResultSet-wasNull rs)
-							      "&nbsp;"
-							      (begin ;; else
-								(if (< result-double 0)
+
+							      (then-block 
+							        "&nbsp;"
+								(set! exist-delta #f))
+
+							      (else-block ;; else
+							        (if (< result-double 0)
 								    (set! sign "-")
 								    (set! sign "&nbsp;"))
+
+								(set! delta result-double)
 								(set! aresult (abs result-double))
+								
 								(set! resultd (fix (/ aresult 100)))
 								(set! resultd-str (num->string resultd))
 								(debug-display-nl  "BiglooCode.scm :: ResultatMesuresF : passed (set! resultd-str (num->string resultd))")
@@ -1343,6 +1370,12 @@
 			       ) ;; end de string-append , bizarre emacs le voit pas 
 			   ) ;; end (set! res ...
 
+
+		     ;; add the 2000-Coordinates of the object in HTML data
+		     (when (and exist-alpha exist-delta)
+			   (html-print-2000-Coordinates (fix alpha)
+							(fix delta)))
+		     
 
 		     (set! res (string-append
 			    res
@@ -2510,6 +2543,7 @@
 	 (flagobjet 0)
 	 (requeteuni::java.lang.String  (begin
 					  (set! objet bstr_objet)
+					  (set! objet (convert-Nom objet))
 					  (eu.oca.bigloofunct.JavaForBigloo-bstring->jstring (string-append "SELECT DISTINCTROW Coordonnées.Nom FROM Coordonnées WHERE Coordonnées.Nom Like '" objet " %'"))))
 	 (requetexiste "")
 	 ;;(requetexiste::java.lang.String (java.lang.String-java.lang.String8 (string-append "SELECT DISTINCTROW Coordonnées.Nom FROM Coordonnées WHERE Coordonnées.Nom Like '" objet "'")))
@@ -4605,11 +4639,87 @@
     (loop))
 		
   (set! res (string-append
-	     res
-	     "</table>")))
+	                   res
+	                   "</table>")))
 
 
+(define (BACKUP-html-print-2000-Coordinates alpha delta exist-alpha exist-delta) ;; TODO traiter les cas ou ils existent pas
+  (let* ((coordinates-2000 "")
+	 (alpha-str (if exist-alpha 
+			      (format 
+			            ;;(num->string (fix alpha)) ;;(format alpha "~5,0d") ;; a string
+			            "~5,0d"
+				    (fix alpha))
+			      "UNKNOWN ALPHA"))
+			
+	 (delta-abs-str (begin
+			      (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresF :: html-print-2000-Coordinates :: alpha-str = " alpha-str) 
+			      (if exist-delta
+				         (format
+					         ;;(num->string (fix delta)) ;;(format (abs delta) "~4,0d")
+					         ;;(fix delta)
+						 "~4,0d"
+						 (fix delta))
+					 "UNKNOWN DELTA")))
+	 (delta-sign "+")
+	 (prefix-HTML-str "<br><center><p style=\"color:#808080\">Coordonn&eacute;es 2000 : ")
+	 (postfix-HTML-str "</p></center><br>")
+	 (code-HTML ""))
+    
+    (when (and exist-delta 
+	       (< delta 0))
+	  (set! delta-sign "-"))
 
+    ;; coordinates 2000
+    (set! coordinates-2000
+	  (string-append 
+	                alpha-str delta-sign delta-abs-str))
+			
+
+    (set! code-HTML
+	  (string-append 
+	                 prefix-HTML-str
+	                 coordinates-2000
+			 postfix-HTML-str))
+    
+    (set! res (string-append
+	                    res
+			    code-HTML))))
+
+
+(define (html-print-2000-Coordinates alpha delta) 
+  (let* ((coordinates-2000 "")
+	 (alpha-str (format "~5,0d" alpha))
+			    
+			
+	 (delta-abs-str	(format	"~4,0d"	
+				(abs delta)))
+	 (delta-sign (if (< delta 0) 
+			 "-"
+			 "+"))
+	 ;;(prefix-HTML-str "<br><center><p style=\"color:#808080\">Coordonn&eacute;es 2000 : ")
+	 (prefix-HTML-str "<br><center><p style=\"color:#808080\">INDEX WDS : ")
+	 (postfix-HTML-str "</p></center><br>")
+	 (code-HTML ""))
+    
+    (debug-display-var-nl   "BiglooCode.scm :: html-print-2000-Coordinates :: delta = " delta)
+    (debug-display-var-nl   "BiglooCode.scm :: html-print-2000-Coordinates :: delta-sign = " delta-sign)
+
+    ;; coordinates 2000
+    (set! coordinates-2000
+	  (string-append 
+	                alpha-str delta-sign delta-abs-str))
+			
+
+    (set! code-HTML
+	  (string-append 
+	                 prefix-HTML-str
+	                 coordinates-2000
+			 postfix-HTML-str))
+    
+    (set! res (string-append
+	                    res
+			    code-HTML))))
 
 
 (define (sql-server->mysql-server-syntax query) ;; replace [ ] by `
@@ -4704,3 +4814,202 @@
   (if (bignum? n)
       (bignum->string n)
       (number->string n)))
+
+(define (get-char str)
+  (string-ref str 0))
+
+
+;;(trim-leading "    tttt") -> tttt
+(define (trim-leading str)
+  (define i (string-skip str #\space))
+  (substring str i))
+
+;; (trim-trailing "####  ") -> ####
+(define (trim-trailing str)
+  (define i (string-skip-right str #\space))
+  (substring str 0 (+ i 1)))
+
+
+;;(begin (display "|") (display (trim-both "    #####     ")) (display "|") (newline)) -> |#####|
+(define (trim-both str)
+  (trim-trailing (trim-leading str)))
+
+
+;; convert name of binary (double star stellar object) to the WDS (Washington Double Star) catalog format with composant appended at the end
+(define (convert-Nom s) ;; Nom is variable 'objet'
+
+  ;; call the pregexp-match function
+  ;;
+  ;; first, some examples from the REPL tests:
+  ;; (pregexp-match "^[[:space:]]*([[:alpha:]]{1,6})[[:space:]]*([[:digit:]]{1,6})[[:space:]]*([[:alpha:]-:,[:space:]]{0,5})[[:space:]]*$" "mca 75a b") -> (mca 75a b mca 75 a b)
+  ;; (pregexp-match "^[[:space:]]*([[:alpha:]]{1,6})[[:space:]]*([[:digit:]]{1,6})[[:space:]]*([[:alpha:]-:,[:space:]]{0,5})[[:space:]]*$" "COU 14 AB") -> (COU 14 AB COU 14 AB)
+  ;; (pregexp-match "^[[:space:]]*([[:alpha:]]{1,6})[[:space:]]*([[:digit:]]{1,6})[[:space:]]*([[:alpha:]-:,[:space:]]{0,5})[[:space:]]*$" "C1OU14AB") -> #f
+  ;; (pregexp-match "^[[:space:]]*([[:alpha:]]{1,6})[[:space:]]*([[:digit:]]{1,6})[[:space:]]*([[:alpha:]-:,[:space:]]{0,5})[[:space:]]*$" "COU 14") -> (COU 14 COU 14 )
+  ;; (pregexp-match "^[[:space:]]*([[:alpha:]]{1,6})[[:space:]]*([[:digit:]]{1,6})[[:space:]]*([[:alpha:]-:,[:space:]]{0,5})[[:space:]]*$" "COU") -> #f 
+
+  ;; (pregexp-match "^[[:space:]]*([[:alpha:]]{1,6})[[:space:]]*([[:digit:]]{1,6})[[:space:]]*([[:alpha:]-:,[:space:]]{0,5})[[:space:]]*$" "H 5 32 Aa-B") -> #f
+  ;; (pregexp-match "^[[:space:]]*([[:alpha:]]{1,6})[[:space:]]*([[:digit:]]{1,6})[[:space:]]*([[:alpha:]-:,[:space:]]{0,5})[[:space:]]*$" "alpha ori") -> #f
+
+  ;;(define reg-exp "^[[:space:]]*([[:alpha:]]{1,6})[[:space:]]*([[:digit:]]{1,6})[[:space:]]*([[:alpha:]-:,[:space:]]{0,5})[[:space:]]*$")
+
+  (define reg-exp-some-spaces "[[:space:]]*")
+
+  (define reg-exp-Discoverer "([[:alpha:]]{1,6})") ;; ex.: COU
+  
+  ;;(define reg-exp-Components "([[:alpha:]-:,[:space:]]{0,5})") ;; examples: a b , Aa-B , AB
+  ;;(define reg-exp-Components "[[[:alpha:]]*[-:,[:space:]]?[[:alpha:]]*]{0,5}") ;; examples: a b , Aa-B , AB
+  ;;(define reg-exp-Components "^[[:alpha:]]?[[:alpha:]-:,[:space:]]{0,3}[[:alpha:]]?$") ;; examples: a b , Aa-B , AB
+  ;;(define reg-exp-Components "T[[:alpha:]][[:alpha:]-:,[:space:]]{0,3}[[:alpha:]]$") ;; examples: a b , Aa-B , AB
+  ;;(define reg-exp-Components "[[:alpha:]][[:alpha:]-:,[:space:]]{0,3}[[:alpha:]]$") ;; examples: a b , Aa-B , AB
+  ;;(define reg-exp-Components "T[[:alpha:]][[:alpha:]-:,[:space:]]{0,3}[[:alpha:]]") ;; examples: a b , Aa-B , AB
+  ;;(define reg-exp-Components "([[:alpha:]][[:alpha:]-:,[:space:]]{0,3}[[:alpha:]])") ;; examples: a b , Aa-B , AB
+  
+  ;;(define reg-exp-Components "([[:alpha:]][[:alpha:]-:,[:space:]]{0,3}[[:alpha:]])") ;; examples: a b , Aa-B , AB
+  ;;(define reg-exp-Components "([[:alpha:][[:alpha:]-:,[:space:]]{0,3}[:alpha:]]?)") ;; examples: a b , Aa-B , AB
+  
+  ;;(define reg-exp-Components "(^$|[[:alpha:]][[:alpha:]-:,[:space:]]{0,3}[[:alpha:]])")
+  
+  (define reg-exp-Components-simple "([[:alpha:]-:,[:space:]]{0,5})")
+  ;;(define reg-exp-Components-simple "([[:alpha:]-:,[:space:]]{1,5})")
+  (define reg-exp-Components-refined "([[:alpha:]][[:alpha:]-:,[:space:]]{0,3}[[:alpha:]])")
+  
+  ;; (pregexp-match reg-exp-Components "Aa-B") -> (Aa-B Aa-B)
+  ;; (pregexp-match reg-exp-Components "A B") -> (A B A B)
+  ;; (pregexp-match reg-exp-Components "AB") -> (AB AB)
+
+  (define reg-exp-simple-Number "^([[:digit:]]{1,6})$") ;; (pregexp-match reg-exp-simple-Number "123456789") -> #f
+  ;; (pregexp-match reg-exp-simple-Number "1234") -> (1234)
+
+  ;;(define reg-exp-space-separated-Numbers "[[:digit:]]{1,4}[[:space:]][[:digit:]]{1,4}")
+  ;;(define reg-exp-space-separated-Numbers "([[:digit:]]{1,4}[[:space:]]?[[:digit:]]{1,4})")
+  ;;(define reg-exp-space-separated-Numbers "([[:digit:]]{1,4}[[:space:]]*[[:digit:]]{1,4})")
+  (define reg-exp-space-separated-Numbers "([[:digit:]]{1,4}[[:space:]]*[[:digit:]]{0,4})")
+
+  (define reg-exp-Numbers (string-append "([" reg-exp-simple-Number "|" reg-exp-space-separated-Numbers "])"))
+  ;;(define reg-exp-Numbers (string-append "([" reg-exp-simple-Number "|" reg-exp-space-separated-Numbers "])"))
+
+  ;;(define reg-exp-Discoverer-Numbers (string-append "^" reg-exp-Discoverer reg-exp-some-spaces reg-exp-Numbers "$"))
+
+  (define reg-exp-spaces-Discoverer-Numbers-spaces (string-append reg-exp-some-spaces reg-exp-Discoverer reg-exp-some-spaces reg-exp-Numbers reg-exp-some-spaces))
+
+  ;;(define reg-exp-spaces-Discoverer-Numbers-spaces (string-append "^" reg-exp-some-spaces reg-exp-Discoverer reg-exp-some-spaces reg-exp-Numbers reg-exp-some-spaces "$"))
+
+  
+
+  (define reg-exp-spaces-Discoverer-Number-or-Numbers-spaces-Components (string-append "^" reg-exp-some-spaces reg-exp-Discoverer reg-exp-some-spaces reg-exp-Numbers reg-exp-some-spaces  reg-exp-Components-simple))
+
+  ;;(define reg-exp "^[[:space:]]*([[:alpha:]]{1,6})[[:space:]]*([[:digit:]]{1,6})[[:space:]]*([[:alpha:]-:,[:space:]]{0,5})[[:space:]]*$")
+
+  (define reg-exp-spaces-Discoverer-Number-spaces-Components (string-append "^" reg-exp-some-spaces reg-exp-Discoverer reg-exp-some-spaces reg-exp-simple-Number reg-exp-some-spaces  reg-exp-Components-simple "$"))
+
+  ;; (pregexp-match reg-exp-spaces-Discoverer-Number-spaces-Components "H 5 32 Aa-B") -> 
+
+  ;;(define reg-exp-spaces-Discoverer-Number-spaces-Components-spaces (string-append "^" reg-exp-some-spaces reg-exp-Discoverer reg-exp-some-spaces reg-exp-simple-Number reg-exp-some-spaces  reg-exp-Components-simple reg-exp-some-spaces "$"))
+
+  ;;(define reg-exp-spaces-Discoverer-Number-spaces-Components-spaces (string-append "^" reg-exp-some-spaces reg-exp-Discoverer reg-exp-some-spaces reg-exp-simple-Number reg-exp-some-spaces  reg-exp-Components-simple reg-exp-some-spaces))
+  
+  (define reg-exp-spaces-Discoverer-Numbers-spaces-Components-spaces (string-append "^" reg-exp-some-spaces reg-exp-Discoverer reg-exp-some-spaces reg-exp-space-separated-Numbers  reg-exp-some-spaces  reg-exp-Components-simple reg-exp-some-spaces))
+
+  ;;(define reg-exp-spaces-Discoverer-Number-or-Numbers-spaces-Components-spaces (string-append "^" reg-exp-some-spaces reg-exp-Discoverer reg-exp-some-spaces reg-exp-Numbers reg-exp-some-spaces  reg-exp-Components-simple reg-exp-some-spaces))
+
+  (define reg-exp-number6 "[[:digit:]]{1,6}")
+
+  (define pm-objet (pregexp-match reg-exp-spaces-Discoverer-Numbers-spaces-Components-spaces s))
+  ;;(define pm-objet (pregexp-match reg-exp-spaces-Discoverer-Number-or-Numbers-spaces-Components-spaces s))
+  
+  (display-nl "BiglooCode.scm :: convert-Nom : pm-objet =")
+  
+  (display-regex-match pm-objet)
+
+  (if pm-objet ;; valid Name
+      (let* ((cluster-list (rest pm-objet))
+	     (discoverer (first cluster-list))
+	     (number-tmp (second cluster-list))
+	     (reg-exp-digit-space (begin
+				    (debug-display "BiglooCode.scm :: convert-Nom : number-tmp :")
+				    (debug-display number-tmp)
+				    (debug-display-nl "|")
+				    (debug-display-nl "BiglooCode.scm :: convert-Nom : in affectation of reg-exp-digit-space")
+				    "^[[:digit:]]{1,6}[[:space:]]+$"))
+	     (pm-objet-5 (pregexp-match reg-exp-digit-space number-tmp))
+	     (number (if (begin ;; on  va tester si on a un nombre simple et si c'est ça on raccourçi de tous les espaces
+			   (debug-display "BiglooCode.scm :: convert-Nom : pm-objet-5 :")
+			   (debug-display-nl pm-objet-5)
+			   pm-objet-5)
+			 (let ((pm-objet4 (pregexp-match #;"[[:digit:]]{1,6}" reg-exp-number6 number-tmp)))
+			   (debug-display "BiglooCode.scm :: convert-Nom :  pm-objet4 first = ")
+			   (debug-display-nl pm-objet4)
+			   (if pm-objet4  ;; if number
+			       (begin
+				 (display "BiglooCode.scm :: convert-Nom :  pm-objet4 = ")
+				 (display-all-results-of-regex-match pm-objet4)
+				 (first pm-objet4)) ;; "123     " -> "123"
+			       (display-nl "BiglooCode.scm :: convert-Nom :  pm-objet4 : false"))) ;; end let
+			 ;; else
+			 (begin 
+			   (debug-display "BiglooCode.scm :: convert-Nom : number-tmp :")
+			   (debug-display-nl number-tmp)
+			   number-tmp)))
+	     (component (begin
+			  (debug-display "BiglooCode.scm :: convert-Nom : number =")
+			  (debug-display-nl number)
+			  (third cluster-list)))
+	     (pm-objet3 (pregexp-match reg-exp-simple-Number number))) ;; simple number? or two numbers
+	     
+	;; body of let
+	(display-nl "BiglooCode.scm :: convert-Nom : pm-objet3 =")
+	(if pm-objet3
+	    (display-all-results-of-regex-match pm-objet3)
+	    (display-nl pm-objet3))
+
+	(if pm-objet3 ;; simple number?
+	    
+	    ;; attention le  nombre de clusters est toujours de 3 mais certaines chaines peuvent etre vides 
+	    (if (string-null? component) ;; no component
+		(concat_7 discoverer number) ;; return this string
+		
+		;; checking the component more precisely with reg-exp-Components-refined
+		(let* ((pm-objet2 (pregexp-match reg-exp-Components-refined component))
+		       (fine-component (when pm-objet2
+					     (second pm-objet2))))
+		  (if pm-objet2
+		      (string-append (concat_7 discoverer number) fine-component)
+		      (concat_7 discoverer number))))
+
+	    ;; else we return s (not a simple number)
+	    s)
+	) ;; end let*
+	      
+      ;; else we simply return the input unchanged
+      s))
+
+
+(define display-result-one-regex-match (lambda (x) (begin (display "[") (display x) (display "]") (newline))))
+
+
+;; BiglooCode.scm :: convert-Nom : pm-objet =
+;; [H 5 32 Aa-B]
+;; [H]
+;; [5 32]
+;; [Aa-B]
+(define (display-all-results-of-regex-match L) (map display-result-one-regex-match L))
+
+(define (display-regex-match rm)
+  (if rm
+      (display-all-results-of-regex-match rm)
+      (display-nl rm)))
+    
+(define (concat_7 str1 str2)
+  ;; DECLARE spc VARCHAR(7) DEFAULT SPACER(7-(LENGTH(str1)+LENGTH(str2)));
+  (define spc (spacer (- 7 (+ (string-length str1)
+			      (string-length str2)))))
+  ;; RETURN CONCAT(str1,spc,str2);
+  (string-append str1 spc str2))
+
+;; return a string of n spaces
+(define (spacer n)
+  (if (= n 0)
+      ""
+      (string-append " " (spacer (- n 1)))))
+
+
