@@ -10,6 +10,8 @@
 ;;
 ;; building a jar library for netbeans:
 ;; jar cf ~/Dropbox/BiglFunctProg.jar eu
+;;
+;; only to be done the first time:
 ;; how to make bigloo_s.zip usable by tomcat server:
 ;; mkdir tmp
 ;; cd tmp
@@ -398,6 +400,8 @@
 	 (flagobjet 0)
 	 (requeteuni::java.lang.String  (begin
 					  (set! objet bstr_objet) ;; pourquoi j'affecte objet ici , ce serai mieux au niveau de la definition et juste apres l'allocation (peut etre pour eviter un comportement bizarre du compilateur)
+					  (display "BiglooCode.scm : ResultatMesuresF: objet =")
+					  (display-nl objet)
 					  (display-nl "BiglooCode.scm : ResultatMesuresF: launching convert-Nom")
 					  (set! objet (convert-Nom objet))
 					  (eu.oca.bigloofunct.JavaForBigloo-bstring->jstring (string-append "SELECT DISTINCTROW Coordonnées.Nom FROM Coordonnées WHERE Coordonnées.Nom Like '" objet " %'"))))
@@ -789,7 +793,7 @@
 						  res
 						  "<tr>
                                                        <td>"
-						             (string-upcase resultat) " &nbsp;
+						             (string-set-lower-case-ending resultat 7) " &nbsp;
                                                        </td>
                                                    </tr>"))
 				       (java.sql.ResultSet-next rsuni)
@@ -1150,7 +1154,7 @@
                                                 <tr>
                                                      <th>
                                                           <font color=\"#0000FF\"> Objet <br></font>"
-			                                   (field-result-set rs 1)
+			                                   (field-result-set-lower-case-ending rs 1 7)
 			                             "</th>"
 		                                            "<td align=\"center\"><font color=\"#0000FF\"> N° BD<br></font>"
 							    (field-result-set-lowercase rs 3)
@@ -1637,7 +1641,7 @@
                                                 <tr>
                                                      <th>
                                                           <font color=\"#0000FF\"> Objet <br></font>"
-			                                   (field-result-set rs 1)
+			                                   (field-result-set-lower-case-ending rs 1 7)
 			                             "</th>"
 		                                            "<td align=\"center\"><font color=\"#0000FF\"> N° BD<br></font>"
 							    (field-result-set-lowercase rs 3)
@@ -2087,7 +2091,7 @@
                                                 <tr>
                                                      <th>
                                                           <font color=\"#0000FF\"> Objet <br></font>"
-			                                   (field-result-set rs 1)
+			                                   (field-result-set-lower-case-ending rs 1 7)
 			                             "</th>"
 		                                            "<td align=\"center\"><font color=\"#0000FF\"> N° BD<br></font>"
 							    (field-result-set-lowercase rs 3)
@@ -2916,7 +2920,7 @@
 						  res
 						  "<tr>
                                                        <td>"
-						             (string-upcase resultat) " &nbsp;
+						             (string-set-lower-case-ending resultat 7) " &nbsp;
                                                        </td>
                                                    </tr>"))
 				       (java.sql.ResultSet-next rsuni)
@@ -3266,7 +3270,7 @@
                                                 <tr>
                                                      <th>
                                                           <font color=\"#0000FF\"> Object <br></font>"
-			                                   (field-result-set rs 1)
+			                                   (field-result-set-lower-case-ending rs 1 7)
 			                             "</th>"
 		                                            "<td align=\"center\"><font color=\"#0000FF\"> BD #<br></font>"
 							    (field-result-set-lowercase rs 3)
@@ -3716,7 +3720,7 @@
                                                 <tr>
                                                      <th>
                                                           <font color=\"#0000FF\"> Object <br></font>"
-			                                   (field-result-set rs 1)
+			                                   (field-result-set-lower-case-ending rs 1 7)
 			                             "</th>"
 		                                            "<td align=\"center\"><font color=\"#0000FF\"> BD #<br></font>"
 							    (field-result-set-lowercase rs 3)
@@ -4167,7 +4171,7 @@
                                                 <tr>
                                                      <th>
                                                           <font color=\"#0000FF\"> Object <br></font>"
-			                                   (field-result-set rs 1)
+			                                   (field-result-set-lower-case-ending rs 1 7)
 			                             "</th>"
 		                                            "<td align=\"center\"><font color=\"#0000FF\"> BD #<br></font>"
 							    (field-result-set-lowercase rs 3)
@@ -4570,7 +4574,7 @@
 					    res
 						  "<tr>
                                                        <td>"
-						             (string-upcase resultat) " &nbsp;
+						             (string-set-lower-case-ending resultat 7) " &nbsp;
                                                        </td>
                                                    </tr>"))
 				 (java.sql.ResultSet-next rs)
@@ -4630,7 +4634,7 @@
 						  res
 						  "<tr>
                                                        <td>"
-						             (string-upcase resultat) " &nbsp;
+						             (string-set-lower-case-ending resultat 7) " &nbsp;
                                                        </td>
                                                    </tr>"))
 			 (java.sql.ResultSet-next rs)
@@ -4725,7 +4729,7 @@
 (define (sql-server->mysql-server-syntax query) ;; replace [ ] by `
   (string-replace (string-replace query #\[ #\`) #\] #\`))
 
-;; extract field n from result set and return an HTML string
+;; extract field n from result set and return an HTML string in upper case
 (define (field-result-set rs n)
 
   (let ((jresult::java.lang.String (java.lang.String-java.lang.String8 ""))
@@ -4744,11 +4748,47 @@
 	(string-upcase result))))
 
 
-;; extract field n from result set and renturn an HTML string in lower case
+;; extract field n from result set and return an HTML string in upper case and lower case starting at position x
+(define (field-result-set-lower-case-ending rs n x)
+
+  (let ((jresult::java.lang.String (java.lang.String-java.lang.String8 ""))
+	(result "")
+	(len 0)) ;; length of string
+    
+    (set! jresult (java.sql.ResultSet-getString2 rs n))
+    (set! result (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresult))
+    (debug-display-nl (string-append "BiglooCode.scm :: field-result-set : result = " result))
+    
+    (debug-display "BiglooCode.scm :: field-result-set : = (java.sql.ResultSet-wasNull rs) :")
+    (debug-display (java.sql.ResultSet-wasNull rs))
+    (debug-newline)
+    
+    (if (java.sql.ResultSet-wasNull rs)
+	"&nbsp;" 
+	(else-block
+	  (set! len (string-length result))
+	  (if (>= x len)
+	      (string-upcase result)
+	      (else-block
+	       (string-append (string-upcase (substring result 0 x))
+			      (substring result x))))))))
+
+
+(define (string-set-lower-case-ending str x)
+  (if (>= x (string-length str))
+      (string-upcase str)
+      (else-block ;; a supprimer car il y a que une instruction
+       (string-append (string-upcase (substring str 0 x))
+		      (substring str x)))))
+
+
+;; extract field n from result set and renturn an HTML string in lower
 (define (field-result-set-lowercase rs n)
 
   (let ((jresult::java.lang.String (java.lang.String-java.lang.String8 ""))
 	(result ""))
+	
+
     
     (set! jresult (java.sql.ResultSet-getString2 rs n))
     (set! result (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresult))
