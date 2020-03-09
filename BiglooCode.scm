@@ -404,7 +404,10 @@
 					  (display-nl objet)
 					  (display-nl "BiglooCode.scm : ResultatMesuresF: launching convert-Nom")
 					  (set! objet (convert-Nom objet))
-					  (eu.oca.bigloofunct.JavaForBigloo-bstring->jstring (string-append "SELECT DISTINCTROW Coordonnées.Nom FROM Coordonnées WHERE Coordonnées.Nom Like '" objet " %'"))))
+					  ;;(eu.oca.bigloofunct.JavaForBigloo-bstring->jstring (string-append "SELECT DISTINCTROW Coordonnées.Nom FROM Coordonnées WHERE Coordonnées.Nom Like '" objet " %'"))
+					  ;;(eu.oca.bigloofunct.JavaForBigloo-bstring->jstring (string-append "SELECT DISTINCTROW Coordonnées.Nom FROM Coordonnées WHERE Coordonnées.Nom Like '" objet " %' ORDER BY Coordonnées.Nom"))
+					  (eu.oca.bigloofunct.JavaForBigloo-bstring->jstring (string-append "SELECT DISTINCTROW Coordonnées.Nom FROM Coordonnées WHERE Coordonnées.Nom Like '" objet "%' ORDER BY Coordonnées.Nom"))
+					  ))
 
 	 (requetexiste "")
 	 ;;(requetexiste::java.lang.String (java.lang.String-java.lang.String8 (string-append "SELECT DISTINCTROW Coordonnées.Nom FROM Coordonnées WHERE Coordonnées.Nom Like '" objet "'")))
@@ -513,7 +516,7 @@
 	 
 	 )
 
-    (set! debug-mode #f) ;; debug-mode is defined in debug.scm
+    (set! debug-mode #t) ;; debug-mode is defined in debug.scm
     (display-var-nl "BiglooCode.scm :: ResultatMesuresF ::  debug-mode = "  debug-mode )
 
     ;;(debug-display-msg-symb-nl  "BiglooCode.scm :: ResultatMesuresF ::" nombreobjets ) ;; je sais pas pourquoi cette macro fais planter bigloo ici mais pas dans d'autres situations
@@ -702,7 +705,8 @@
 	       
 	       (debug-display-var-nl "BiglooCode.scm :: ResultatMesuresF ::  flagexiste = "  flagexiste)
 
-	       (when (and (= objetexiste 1) (>= nombreobjets 1))
+	       ;;(when (and (= objetexiste 1) (>= nombreobjets 1))
+	       (when (and (= objetexiste 1) (> nombreobjets 1))
 		     (set! flagobjet 1))))
 
      ((string=? identificateur "N° ADS")
@@ -724,93 +728,48 @@
     ;;(set! flaguni 1)
 
     (if (or (= flagerreur 1) (= flaguni 1) (= flagexiste 1))
+
 	(begin
+
 	  (when (= flagerreur 1)
-		(set! res (string-append
-			   res
-		     "<h1 align=\"center\">
-                          <font color=\"#0000FF\">SIDONIe - Résultats : Identifications et mesures</font>
-                      </h1>
-                      <div align=\"center\">
-                          <center>
-                                  <table width=\"85%\" border=\"3\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\">
-                                        <tr>
-                                             <th width=\"80%\">
-                                                 <font color=\"#0000FF\">"
-                                                       baraterreur "<br>
-                                                 </font>
-                                             </th>
-                                        </tr>
-                                  </table>
-                          </center>
-                      </div>")))
+		(set! res (insert-baratin-in-HTML-french-short baraterreur res)))
 
 	  
 	  (when (= flagexiste 1)
-		(set! res (string-append
-			   res
-		     "<h1 align=\"center\">
-                          <font color=\"#0000FF\">SIDONIe - Résultats : Identifications et mesures</font>
-                      </h1>
-                      <div align=\"center\">
-                          <center>
-                                  <table width=\"85%\" border=\"3\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\">
-                                        <tr>
-                                             <th width=\"80%\">
-                                                 <font color=\"#0000FF\">"
-                                                       baratexiste "<br>
-                                                 </font>
-                                             </th>
-                                        </tr>
-                                  </table>
-                          </center>
-                      </div>
-		      <P>
-                      <P>
-                      <table border=\"1\" cellpadding=\"0\" align=\"center\" cellspacing=\"0\" width=\"20%\" >
-                      <tr>
-                          <th><font color=\"#000080\" > Objets </font></th>
-                      </tr>"))
+		(set! res (insert-baratin-in-HTML-french baratexiste res))
 
-		(java.sql.ResultSet-first rsuni)
-		
 		(debug-display-nl  "BiglooCode.scm :: ResultatMesuresF :: nom :: (when (= flagexiste 1) :: before loop !")
-		
-		(letrec ((resultat "UN RESULTAT")
-			 (loop (lambda ()
-				 (if (java.sql.ResultSet-isAfterLast rsuni)
-				     '()
-				     (let ((jresultat::java.lang.String #;(java.lang.String-java.lang.String8 "a result") (java.sql.ResultSet-getString2 rsuni 0))
-					   (bstr_tmp '()))
-				       (debug-display-nl  "BiglooCode.scm :: ResultatMesuresF :: before (set! bstr_tmp (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresultat))")
-				       (set! bstr_tmp (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresultat)) 
-				       (debug-display-nl  "BiglooCode.scm :: ResultatMesuresF :: before (set! resultat jresultat)")
-				       (set! resultat bstr_tmp) ;; a revoir quand utilise (convertir avec une procedure java en byte char puis scheme string je pense)
-				       (debug-display-var-nl   "BiglooCode.scm :: ResultatMesuresF :: resultat = " resultat)
-				       (when (string-null? resultat)
-					     (set! resultat "&nbsp;"))
-				       (set! res (string-append
-						  res
-						  "<tr>
-                                                       <td>"
-						             (string-set-lower-case-ending resultat 7) " &nbsp;
-                                                       </td>
-                                                   </tr>"))
-				       (java.sql.ResultSet-next rsuni)
-				       (debug-display-nl  "BiglooCode.scm :: ResultatMesuresF :: looping !")
-				       (loop))))))
-		  (loop))
-		  
 
-		;; (let loop ((l '(1 2 3)))
-		;;   (if (java.sql.ResultSet-isAfterLast rsuni)
-		;;       '()
-		;;       (begin
-		;; 	(set! res (string-append
-		;; 		   res
-		;; 		   " A "))
-		;; 	(java.sql.ResultSet-next rsuni)
-		;; 	(loop))))
+		(the-loop-on-resultset rsuni)
+		
+		;; (java.sql.ResultSet-first rsuni)
+		
+		;; (debug-display-nl  "BiglooCode.scm :: ResultatMesuresF :: nom :: (when (= flagexiste 1) :: before loop !")
+		
+		;; (letrec ((resultat "UN RESULTAT")
+0		;; 	 (loop (lambda ()
+		;; 		 (if (java.sql.ResultSet-isAfterLast rsuni)
+		;; 		     '()
+		;; 		     (let ((jresultat::java.lang.String #;(java.lang.String-java.lang.String8 "a result") (java.sql.ResultSet-getString2 rsuni 0))
+		;; 			   (bstr_tmp '()))
+		;; 		       (debug-display-nl  "BiglooCode.scm :: ResultatMesuresF :: before (set! bstr_tmp (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresultat))")
+		;; 		       (set! bstr_tmp (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresultat)) 
+		;; 		       (debug-display-nl  "BiglooCode.scm :: ResultatMesuresF :: before (set! resultat jresultat)")
+		;; 		       (set! resultat bstr_tmp) ;; a revoir quand utilise (convertir avec une procedure java en byte char puis scheme string je pense)
+		;; 		       (debug-display-var-nl   "BiglooCode.scm :: ResultatMesuresF :: resultat = " resultat)
+		;; 		       (when (string-null? resultat)
+		;; 			     (set! resultat "&nbsp;"))
+		;; 		       (set! res (string-append
+		;; 				  res
+		;; 				  "<tr>
+                ;;                                        <td>"
+		;; 				             (string-set-lower-case-ending resultat 7) " &nbsp;
+                ;;                                        </td>
+                ;;                                    </tr>"))
+		;; 		       (java.sql.ResultSet-next rsuni)
+		;; 		       (debug-display-nl  "BiglooCode.scm :: ResultatMesuresF :: looping !")
+		;; 		       (loop))))))
+		;;   (loop))
 
 		(set! res (string-append
 			   res
@@ -2548,7 +2507,8 @@
 	 (requeteuni::java.lang.String  (begin
 					  (set! objet bstr_objet)
 					  (set! objet (convert-Nom objet))
-					  (eu.oca.bigloofunct.JavaForBigloo-bstring->jstring (string-append "SELECT DISTINCTROW Coordonnées.Nom FROM Coordonnées WHERE Coordonnées.Nom Like '" objet " %'"))))
+					  ;;(eu.oca.bigloofunct.JavaForBigloo-bstring->jstring (string-append "SELECT DISTINCTROW Coordonnées.Nom FROM Coordonnées WHERE Coordonnées.Nom Like '" objet " %'"))
+					  (eu.oca.bigloofunct.JavaForBigloo-bstring->jstring (string-append "SELECT DISTINCTROW Coordonnées.Nom FROM Coordonnées WHERE Coordonnées.Nom Like '" objet "%' ORDER BY Coordonnées.Nom"))))
 	 (requetexiste "")
 	 ;;(requetexiste::java.lang.String (java.lang.String-java.lang.String8 (string-append "SELECT DISTINCTROW Coordonnées.Nom FROM Coordonnées WHERE Coordonnées.Nom Like '" objet "'")))
 	 ;;(jstr::%jstring (eu.oca.bigloofunct.JavaForBigloo-bstring->jstring "hello boy"))
@@ -2829,7 +2789,7 @@
 	       (when (and (= objetexiste 0) (= nombreobjets 1))
 		     (set! flagexiste 1))
 
-	       (when (and (= objetexiste 1) (>= nombreobjets 1))
+	       (when (and (= objetexiste 1) (> nombreobjets 1))
 		     (set! flagobjet 1))))
 
      ((string=? identificateur "N° ADS")
@@ -2851,93 +2811,49 @@
     ;;(set! flaguni 1)
 
     (if (or (= flagerreur 1) (= flaguni 1) (= flagexiste 1))
+
 	(begin
+
 	  (when (= flagerreur 1)
-		(set! res (string-append
-			   res
-		     "<h1 align=\"center\">
-                          <font color=\"#0000FF\">SIDONIe - Results : Identifications and measurements</font>
-                      </h1>
-                      <div align=\"center\">
-                          <center>
-                                  <table width=\"85%\" border=\"3\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\">
-                                        <tr>
-                                             <th width=\"80%\">
-                                                 <font color=\"#0000FF\">"
-                                                       baraterreur "<br>
-                                                 </font>
-                                             </th>
-                                        </tr>
-                                  </table>
-                          </center>
-                      </div>")))
+		(set! res (insert-baratin-in-HTML-english-short baraterreur res)))
 
 	  
 	  (when (= flagexiste 1)
-		(set! res (string-append
-			   res
-		     "<h1 align=\"center\">
-                          <font color=\"#0000FF\">SIDONIe - Results : Identifications and measurements</font>
-                      </h1>
-                      <div align=\"center\">
-                          <center>
-                                  <table width=\"85%\" border=\"3\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\">
-                                        <tr>
-                                             <th width=\"80%\">
-                                                 <font color=\"#0000FF\">"
-                                                       baratexiste "<br>
-                                                 </font>
-                                             </th>
-                                        </tr>
-                                  </table>
-                          </center>
-                      </div>
-		      <P>
-                      <P>
-                      <table border=\"1\" cellpadding=\"0\" align=\"center\" cellspacing=\"0\" width=\"20%\" >
-                      <tr>
-                          <th><font color=\"#000080\" > Objects </font></th>
-                      </tr>"))
+		(set! res (insert-baratin-in-HTML-english baratexiste res))
 
-		(java.sql.ResultSet-first rsuni)
-		
-		(debug-display-nl  "BiglooCode.scm :: ResultatMesuresAF :: nom :: (when (= flagexiste 1) |   2   | :: before loop !")
-		
-		(letrec ((resultat "UN RESULTAT")
-			 (loop (lambda ()
-				 (if (java.sql.ResultSet-isAfterLast rsuni)
-				     '()
-				     (let ((jresultat::java.lang.String #;(java.lang.String-java.lang.String8 "a result") (java.sql.ResultSet-getString2 rsuni 0))
-					   (bstr_tmp '()))
-				       (debug-display-nl  "BiglooCode.scm :: ResultatMesuresAF :: before (set! bstr_tmp (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresultat))")
-				       (set! bstr_tmp (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresultat)) 
-				       (debug-display-nl  "BiglooCode.scm :: ResultatMesuresAF :: before (set! resultat jresultat)")
-				       (set! resultat bstr_tmp) ;; a revoir quand utilise (convertir avec une procedure java en byte char puis scheme string je pense)
-				       (debug-display-var-nl   "BiglooCode.scm :: ResultatMesuresAF :: resultat = " resultat)
-				       (when (string-null? resultat)
-					     (set! resultat "&nbsp;"))
-				       (set! res (string-append
-						  res
-						  "<tr>
-                                                       <td>"
-						             (string-set-lower-case-ending resultat 7) " &nbsp;
-                                                       </td>
-                                                   </tr>"))
-				       (java.sql.ResultSet-next rsuni)
-				       (debug-display-nl  "BiglooCode.scm :: ResultatMesuresAF :: looping !")
-				       (loop))))))
-		  (loop))
-		  
+		(debug-display-nl  "BiglooCode.scm :: ResultatMesuresAF :: nom :: (when (= flagexiste 1) :: before loop !")
 
-		;; (let loop ((l '(1 2 3)))
-		;;   (if (java.sql.ResultSet-isAfterLast rsuni)
-		;;       '()
-		;;       (begin
-		;; 	(set! res (string-append
-		;; 		   res
-		;; 		   " A "))
-		;; 	(java.sql.ResultSet-next rsuni)
-		;; 	(loop))))
+		(the-loop-on-resultset rsuni)
+
+		;; (java.sql.ResultSet-first rsuni)
+		
+		;; (debug-display-nl  "BiglooCode.scm :: ResultatMesuresAF :: nom :: (when (= flagexiste 1) |   2   | :: before loop !")
+		
+		;; (letrec ((resultat "UN RESULTAT")
+		;; 	 (loop (lambda ()
+		;; 		 (if (java.sql.ResultSet-isAfterLast rsuni)
+		;; 		     '()
+		;; 		     (let ((jresultat::java.lang.String #;(java.lang.String-java.lang.String8 "a result") (java.sql.ResultSet-getString2 rsuni 0))
+		;; 			   (bstr_tmp '()))
+		;; 		       (debug-display-nl  "BiglooCode.scm :: ResultatMesuresAF :: before (set! bstr_tmp (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresultat))")
+		;; 		       (set! bstr_tmp (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresultat)) 
+		;; 		       (debug-display-nl  "BiglooCode.scm :: ResultatMesuresAF :: before (set! resultat jresultat)")
+		;; 		       (set! resultat bstr_tmp) ;; a revoir quand utilise (convertir avec une procedure java en byte char puis scheme string je pense)
+		;; 		       (debug-display-var-nl   "BiglooCode.scm :: ResultatMesuresAF :: resultat = " resultat)
+		;; 		       (when (string-null? resultat)
+		;; 			     (set! resultat "&nbsp;"))
+		;; 		       (set! res (string-append
+		;; 				  res
+		;; 				  "<tr>
+                ;;                                        <td>"
+		;; 				             (string-set-lower-case-ending resultat 7) " &nbsp;
+                ;;                                        </td>
+                ;;                                    </tr>"))
+		;; 		       (java.sql.ResultSet-next rsuni)
+		;; 		       (debug-display-nl  "BiglooCode.scm :: ResultatMesuresAF :: looping !")
+		;; 		       (loop))))))
+		;;   (loop))
+		 
 
 		(set! res (string-append
 			   res
@@ -4518,17 +4434,8 @@
   )
 
 
-
-
-
-
-
-(define (proc-barat baratin rs)
-
-  (debug-display-var-nl  "BiglooCode.scm :: proc-barat :: baratin :: " baratin)
-  (set! res (string-append
-			   res
-			   "<h1 align=\"center\">
+(define (insert-baratin-in-HTML-french-short baratin loc-str)
+  (string-append loc-str "<h1 align=\"center\">
                            <font color=\"#0000FF\">SIDONIe - Résultats : Identifications et mesures</font>
                            </h1>
                            <div align=\"center\">
@@ -4543,31 +4450,68 @@
                                         </tr>
                                   </table>
                               </center>
-                          </div>
-		          <P>
+                          </div>"))
+
+
+(define (insert-baratin-in-HTML-english-short baratin loc-str)
+  (string-append loc-str "<h1 align=\"center\">
+                           <font color=\"#0000FF\">SIDONIe - Results : Identifications and measurements</font>
+                           </h1>
+                           <div align=\"center\">
+                              <center>
+                                  <table width=\"85%\" border=\"3\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\">
+                                        <tr>
+                                             <th width=\"80%\">
+                                                 <font color=\"#0000FF\">"
+                                                       baratin "<br>
+                                                 </font>
+                                             </th>
+                                        </tr>
+                                  </table>
+                              </center>
+                          </div>"))
+
+
+(define (insert-baratin-in-HTML-french baratin loc-str)
+  
+  (string-append (insert-baratin-in-HTML-french-short baratin loc-str)
+		         "<P>
                           <P>
                           <table border=\"1\" cellpadding=\"0\" align=\"center\" cellspacing=\"0\" width=\"20%\" >
                           <tr>
                               <th><font color=\"#000080\" > Objets </font></th>
                           </tr>"))
 
+(define (insert-baratin-in-HTML-english baratin loc-str)
+  
+  (string-append (insert-baratin-in-HTML-french-short baratin loc-str)
+		         "<P>
+                          <P>
+                          <table border=\"1\" cellpadding=\"0\" align=\"center\" cellspacing=\"0\" width=\"20%\" >
+                          <tr>
+                              <th><font color=\"#000080\" > Objects </font></th>
+                          </tr>"))
+
+
+(define (the-loop-on-resultset rs)
+
   (java.sql.ResultSet-first rs)
 		
-  (debug-display-nl  "BiglooCode.scm :: proc-barat :: before loop !")
+  (debug-display-nl  "BiglooCode.scm :: the-loop-on-resultset :: before loop !")
 		
   (letrec ((loop (lambda ()
 		   (if (java.sql.ResultSet-isAfterLast rs)
 		       '()
 		       (begin 
-			       (debug-display-nl  "BiglooCode.scm :: proc-barat :: passed  (java.sql.ResultSet-isAfterLast rs) dans else")
+			       (debug-display-nl  "BiglooCode.scm :: the-loop-on-resultset :: passed  (java.sql.ResultSet-isAfterLast rs) dans else")
 			       (let (
 			     
-				     (jresultat::java.lang.String #;(java.lang.String-java.lang.String8 "a result") (java.sql.ResultSet-getString2 rs 1#;0))
+				     (jresultat::java.lang.String #;(java.lang.String-java.lang.String8 "a result") (java.sql.ResultSet-getString2 rs 1 #;0))
 				     (resultat "UN RESULTAT"))
 				 
-				 (debug-display-nl  "BiglooCode.scm :: proc-barat :: before (set! resultat (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresultat))")
+				 (debug-display-nl  "BiglooCode.scm :: the-loop-on-resultset :: before (set! resultat (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresultat))")
 				 (set! resultat (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresultat))
-				 (debug-display-var-nl   "BiglooCode.scm :: proc-barat :: resultat = " resultat)
+				 (debug-display-var-nl   "BiglooCode.scm :: the-loop-on-resultset :: resultat = " resultat)
 				 (when (string-null? resultat)
 				       (set! resultat "&nbsp;"))
 				 (set! res (string-append
@@ -4578,13 +4522,23 @@
                                                        </td>
                                                    </tr>"))
 				 (java.sql.ResultSet-next rs)
-				 (debug-display-nl  "BiglooCode.scm :: proc-barat :: looping !")
+				 (debug-display-nl  "BiglooCode.scm :: the-loop-on-resultset :: looping !")
 				 (loop)))))))
-	   (loop))
+	   (loop)))
 		
-    (set! res (string-append
-	       res
-	       "</table>")))
+
+(define (proc-barat baratin rs)
+
+  (debug-display-var-nl  "BiglooCode.scm :: proc-barat :: baratin :: " baratin)
+  (set! res (insert-baratin-in-HTML-french baratin res))
+		
+  (debug-display-nl  "BiglooCode.scm :: proc-barat :: before loop !")
+
+  (the-loop-on-resultset rs)
+		
+  (set! res (string-append
+	     res
+	     "</table>")))
 
 
 
