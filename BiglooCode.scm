@@ -383,9 +383,9 @@
 	 (choixres (make-string len_bstr_choixres))
 	 (essai "")
 	 (baraterreur  "Veuillez re-initialiser la page et recommencer la requète : ") ;; baratin erreur
-	 (baratexiste "Veuillez re-initialiser la page et recommencer la requète, l'objet demandé existe, mais avec le nom suivant :") ;; baratin existe
+	 (baratexiste "L'objet demandé existe, mais avec le nom suivant, cliquez sur le bouton Soumettre pour avoir le résultat :") ;; baratin existe
 	 (baratobjet " L'objet demandé existe, mais il existe aussi d'autres objets correspondants à cet identificateur (voir la liste ci-dessous) !")
-	 (baratuni "Veuillez re-initialiser la page et recommencer la requète : Plusieurs objets correspondent à votre requète, choisissez en un seul dans la liste ")
+	 (baratuni "Plusieurs objets correspondent à votre requète, choisissez en un seul dans la liste et cliquez sur le bouton Soumettre à coté: ")
 	 (flagerreur 0) ;; flag erreur
 	 (flaguni 0)  ;; flag unique
 	 (flagexiste 0) ;; flag existe
@@ -402,8 +402,10 @@
 					  (set! objet bstr_objet) ;; pourquoi j'affecte objet ici , ce serai mieux au niveau de la definition et juste apres l'allocation (peut etre pour eviter un comportement bizarre du compilateur)
 					  (display "BiglooCode.scm : ResultatMesuresF: objet =")
 					  (display-nl objet)
-					  (display-nl "BiglooCode.scm : ResultatMesuresF: launching convert-Nom")
+					  (display-nl "BiglooCode.scm : ResultatMesuresF: launching convert-Nom on objet")
 					  (set! objet (convert-Nom objet))
+					  (display "BiglooCode.scm : ResultatMesuresF: objet =")
+					  (display-nl objet)
 					  ;;(eu.oca.bigloofunct.JavaForBigloo-bstring->jstring (string-append "SELECT DISTINCTROW Coordonnées.Nom FROM Coordonnées WHERE Coordonnées.Nom Like '" objet " %'"))
 					  ;;(eu.oca.bigloofunct.JavaForBigloo-bstring->jstring (string-append "SELECT DISTINCTROW Coordonnées.Nom FROM Coordonnées WHERE Coordonnées.Nom Like '" objet " %' ORDER BY Coordonnées.Nom"))
 					  (eu.oca.bigloofunct.JavaForBigloo-bstring->jstring (string-append "SELECT DISTINCTROW Coordonnées.Nom FROM Coordonnées WHERE Coordonnées.Nom Like '" objet "%' ORDER BY Coordonnées.Nom"))
@@ -513,6 +515,7 @@
 	 (delta 0)
 	 (exist-alpha #t)
 	 (exist-delta #t)
+	 (lang "french")
 	 
 	 )
 
@@ -740,7 +743,12 @@
 
 		(debug-display-nl  "BiglooCode.scm :: ResultatMesuresF :: nom :: (when (= flagexiste 1) :: before loop !")
 
-		(the-loop-on-resultset rsuni)
+		(let [(the-loop-on-resultset-function
+		       ;;(the-loop-on-resultset-function-creator (lambda (x) x)))]
+		       (the-loop-on-resultset-function-creator (create-function-form-around-string identificateur choixres lang)))]
+
+		  (the-loop-on-resultset-function rsuni))
+
 		
 		;; (java.sql.ResultSet-first rsuni)
 		
@@ -779,7 +787,13 @@
 
 
 	  (when (= flaguni 1)
-		(proc-barat baratuni rsuni))
+		
+		(let [(the-loop-on-resultset-function (the-loop-on-resultset-function-creator
+						       (create-function-form-around-string identificateur choixres lang)))]
+		  
+		  (proc-barat-form-post-submit baratuni rsuni lang the-loop-on-resultset-function)))
+		;;(proc-barat baratuni rsuni))
+
 
 	  (debug-display-nl  "BiglooCode.scm :: ResultatMesuresF :: before (when (and (= flagerreur 0) (= flagobjet 0) (= flagnom 1))")
 	  (when (and (= flagerreur 0) (= flagobjet 0) (= flagnom 1))
@@ -2488,9 +2502,9 @@
 	 (choixres (make-string len_bstr_choixres))
 	 (essai "")
 	 (baraterreur "Please reload the page and resume : " ) ;; baratin erreur
-	 (baratexiste "Please reload the page and resume : the request object exist but with the following name :") ;; baratin existe
+	 (baratexiste "The request object exist but with the following name, click submit button to continue :") ;; baratin existe
 	 (baratobjet " Requested object exist but there are also objects with the same identifier (see list) !")
-	 (baratuni "Please reload the page and resume : several objects correspond to your request, choose one in the list ")
+	 (baratuni "Several objects correspond to your request, choose one in the list and click the submit button aside it:")
 	 (flagerreur 0) ;; flag erreur
 	 (flaguni 0)  ;; flag unique
 	 (flagexiste 0) ;; flag existe
@@ -2606,6 +2620,7 @@
 	 (resultd-str "")
 	 (resultmi 0)
 	 (resultmi-str "")
+	 (lang "english")
 	 )
 
     ;;(display-msg-symb-nl  "BiglooCode.scm :: ResultatMesuresAF ::" nombreobjets ) ;; je sais pas pourquoi cette macro fais planter bigloo ici mais pas dans d'autres situations
@@ -2823,7 +2838,13 @@
 
 		(debug-display-nl  "BiglooCode.scm :: ResultatMesuresAF :: nom :: (when (= flagexiste 1) :: before loop !")
 
-		(the-loop-on-resultset rsuni)
+		(let [(the-loop-on-resultset-function
+		      ;; (the-loop-on-resultset-function-creator (lambda (x) x)))]
+		       (the-loop-on-resultset-function-creator (create-function-form-around-string identificateur choixres lang)))]
+		  
+		  (the-loop-on-resultset-function rsuni))
+
+		;;(the-loop-on-resultset rsuni)
 
 		;; (java.sql.ResultSet-first rsuni)
 		
@@ -2863,7 +2884,13 @@
 
 
 	  (when (= flaguni 1)
-		(proc-barat-english baratuni rsuni))
+
+		;;(letrec [(the-loop-on-resultset-function (the-loop-on-resultset-function-creator
+		(let [(the-loop-on-resultset-function (the-loop-on-resultset-function-creator
+						       (create-function-form-around-string identificateur choixres lang)))]
+
+		  (proc-barat-form-post-submit baratuni rsuni lang the-loop-on-resultset-function)))
+
 
 	  (debug-display-nl  "BiglooCode.scm :: ResultatMesuresAF :: before (when (and (= flagerreur 0) (= flagobjet 0) (= flagnom 1))")
 	  (when (and (= flagerreur 0) (= flagobjet 0) (= flagnom 1))
@@ -4493,39 +4520,99 @@
                           </tr>"))
 
 
-(define (the-loop-on-resultset rs)
+;; (define (the-loop-on-resultset rs)
 
-  (java.sql.ResultSet-first rs)
+;;   (java.sql.ResultSet-first rs)
 		
-  (debug-display-nl  "BiglooCode.scm :: the-loop-on-resultset :: before loop !")
+;;   (debug-display-nl  "BiglooCode.scm :: the-loop-on-resultset :: before loop !")
 		
-  (letrec ((loop (lambda ()
-		   (if (java.sql.ResultSet-isAfterLast rs)
-		       '()
-		       (begin 
-			       (debug-display-nl  "BiglooCode.scm :: the-loop-on-resultset :: passed  (java.sql.ResultSet-isAfterLast rs) dans else")
-			       (let (
+;;   (letrec ((loop (lambda ()
+;; 		   (if (java.sql.ResultSet-isAfterLast rs)
+;; 		       '()
+;; 		       (begin 
+;; 			       (debug-display-nl  "BiglooCode.scm :: the-loop-on-resultset :: passed  (java.sql.ResultSet-isAfterLast rs) dans else")
+;; 			       (let (
 			     
-				     (jresultat::java.lang.String #;(java.lang.String-java.lang.String8 "a result") (java.sql.ResultSet-getString2 rs 1 #;0))
-				     (resultat "UN RESULTAT"))
+;; 				     (jresultat::java.lang.String #;(java.lang.String-java.lang.String8 "a result") (java.sql.ResultSet-getString2 rs 1 #;0))
+;; 				     (resultat "UN RESULTAT"))
 				 
-				 (debug-display-nl  "BiglooCode.scm :: the-loop-on-resultset :: before (set! resultat (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresultat))")
-				 (set! resultat (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresultat))
-				 (debug-display-var-nl   "BiglooCode.scm :: the-loop-on-resultset :: resultat = " resultat)
-				 (when (string-null? resultat)
-				       (set! resultat "&nbsp;"))
-				 (set! res (string-append
-					    res
-						  "<tr>
-                                                       <td>"
-						             (string-set-lower-case-ending resultat 7) " &nbsp;
-                                                       </td>
-                                                   </tr>"))
-				 (java.sql.ResultSet-next rs)
-				 (debug-display-nl  "BiglooCode.scm :: the-loop-on-resultset :: looping !")
-				 (loop)))))))
-	   (loop)))
+;; 				 (debug-display-nl  "BiglooCode.scm :: the-loop-on-resultset :: before (set! resultat (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresultat))")
+;; 				 (set! resultat (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresultat))
+;; 				 (debug-display-var-nl   "BiglooCode.scm :: the-loop-on-resultset :: resultat = " resultat)
+;; 				 (when (string-null? resultat)
+;; 				       (set! resultat "&nbsp;"))
+;; 				 (set! res (string-append
+;; 					    res
+;; 						  "<tr>
+;;                                                        <td>"
+;; 						             (string-set-lower-case-ending resultat 7) " &nbsp;
+;;                                                        </td>
+;;                                                    </tr>"))
+;; 				 (java.sql.ResultSet-next rs)
+;; 				 (debug-display-nl  "BiglooCode.scm :: the-loop-on-resultset :: looping !")
+;; 				 (loop)))))))
+;; 	   (loop)))
+
+;; defined here create a runtime error in bigloo
+;;(define the-loop-on-resultset (the-loop-on-resultset-function-creator (lambda (x) x)))
+
+
+(define (the-loop-on-resultset-function-creator f)
+  (lambda (rs)
+    (java.sql.ResultSet-first rs)
 		
+    (debug-display-nl  "BiglooCode.scm :: the-loop-on-resultset* :: before loop !")
+		
+    (letrec ((loop (lambda ()
+		     (if (java.sql.ResultSet-isAfterLast rs)
+			 '()
+			 (begin 
+			   (debug-display-nl  "BiglooCode.scm :: the-loop-on-resultset* :: passed  (java.sql.ResultSet-isAfterLast rs) dans else")
+			   (let (
+				 
+				 (jresultat::java.lang.String #;(java.lang.String-java.lang.String8 "a result") (java.sql.ResultSet-getString2 rs 1 #;0))
+				 (resultat "UN RESULTAT"))
+			     
+			     (debug-display-nl  "BiglooCode.scm :: the-loop-on-resultset* :: before (set! resultat (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresultat))")
+			     (set! resultat (eu.oca.bigloofunct.JavaForBigloo-jstring->bstring jresultat))
+			     (debug-display-var-nl   "BiglooCode.scm :: the-loop-on-resultset* :: resultat = " resultat)
+			     (when (string-null? resultat)
+				   (set! resultat "&nbsp;"))
+			     (set! res (string-append
+					res
+					"<tr>
+                                             <td>"
+					              (f (string-set-lower-case-ending resultat 7)) " &nbsp;
+                                             </td>
+                                         </tr>"))
+			     (java.sql.ResultSet-next rs)
+			     (debug-display-nl  "BiglooCode.scm :: the-loop-on-resultset* :: looping !")
+			     (loop)))))))
+      (loop))))
+
+
+;;(define the-loop-on-resultset-form (the-loop-on-resultset-function-creator (create-function-form-around-string identificateur choixres lang)))
+
+(define (create-function-form-around-string identificateur choixres lang)
+  (lambda (objet)
+    (create-html-form-string objet identificateur choixres lang)))
+		
+(define (create-html-form-string objet identificateur choixres lang)
+
+  (let [(url-action (if (string=? lang "french")
+			"ResultatMesuresF"
+			"ResultatMesuresAF"))
+	(name-button (if (string=? lang "french")
+			 "Soumettre"
+			 "Submit"))]
+
+    (string-append "<form action=\"" url-action "\" method=\"post\">
+                          <input type=\"text\" size=\"10\" name=\"T1\" readonly=\"true\" value=\"" objet "\"></td>
+                          <input type=\"hidden\" name=\"identificateur\" value=\"" identificateur "\">
+                          <input type=\"hidden\" name=\"choixres\" value=\"" choixres "\">
+                      <td><input type=\"submit\" name=\"T2\" value=\"" name-button "\">
+                    </form>")))
+
 
 (define (proc-barat baratin rs)
 
@@ -4534,13 +4621,33 @@
 		
   (debug-display-nl  "BiglooCode.scm :: proc-barat :: before loop !")
 
-  (the-loop-on-resultset rs)
+  (let [(the-loop-on-resultset-function
+		       (the-loop-on-resultset-function-creator (lambda (x) x)))]
+
+		  (the-loop-on-resultset-function rs))
+
+  ;;(the-loop-on-resultset rs)
 		
   (set! res (string-append
 	     res
 	     "</table>")))
 
 
+
+
+(define (proc-barat-form-post-submit baratin rs lang the-loop-on-resultset-function)
+
+  (if (string=? lang "french")
+      (set! res (insert-baratin-in-HTML-french baratin res))
+      (set! res (insert-baratin-in-HTML-english baratin res)))
+
+  
+  (the-loop-on-resultset-function rs)
+
+		
+  (set! res (string-append
+	                   res
+	                   "</table>")))
 
 
 (define (proc-barat-english baratin rs)
